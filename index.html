@@ -1,0 +1,269 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory Asset Management</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 20px;
+      background-repeat: no-repeat;
+      background-position: center;  
+      background-image: url(Samvardhana-Motherson-img.jpg); 
+      margin: 10px;
+      background-size: cover;
+      background-attachment: fixed;
+      font-size: x-large; 
+    }
+    table { 
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px; 
+    }
+    th, td {
+      border: 1px solid #460606;
+      padding: 8px;
+      text-align: center; 
+      background-color: aliceblue;
+    }
+    th { 
+      background-color: #c71e1e; 
+    }
+    input { 
+      margin: 15px;
+      padding: 5px;
+      width: 12%;
+      border-color: rgb(94, 6, 6);
+      font-size: large;
+    }
+    button { 
+      padding: 6px 12px;
+      margin: 10px; 
+      font-size: large;
+      background-color: rgb(70, 5, 5);
+      color: antiquewhite;
+      display: block;
+      margin: 50px auto;
+      cursor: pointer;
+    }
+    h2 {
+      color: rgb(109, 0, 0);
+      background-color: rgb(255, 255, 255);
+      width: 15%;
+      padding: 5px;
+      border-radius: 10px;
+      margin: 15px;
+      font-family: Georgia, Times, 'Times New Roman', serif;
+    }
+  </style>
+</head>
+<body>
+  <h2>❁Asset Management❁</h2>
+  <hr>
+  <input type="text" id="user" placeholder="User Id" required /> 
+  <input type="text" id="name" placeholder="Asset" required />
+  <input type="text" id="itemId" placeholder="Model" required />
+  <input type="text" id="number" placeholder="Serial number" required />
+  <input type="text" id="qty" placeholder="Quantity" required />
+  <input type="text" id="EMAIL" placeholder="EMAIL" required />
+  <br>
+  <input type="text" id="deptHead" placeholder="Department Head" required />
+  <input type="text" id="approvalHead" placeholder="Approval Head" required />
+  <input type="date" id="issueDate" required />
+  <input type="text" id="acceptance" placeholder="Acceptance" />
+  <input type="text" id="assignedBy" placeholder="Assigned By" />
+  <br>
+  <button id="addBtn">Add Item</button>
+  <hr>
+  <table id="inventoryTable">
+    <thead>
+      <tr>
+        <th>User Id</th>
+        <th>Name</th>
+        <th>Model</th>
+        <th>Serial number</th>
+        <th>Qty</th>
+        <th>EMAIL</th>
+        <th>Dept Head</th>
+        <th>Approval Head</th>
+        <th>Date</th>
+        <th>Acceptance</th>
+        <th>Assigned By</th>
+        <th>Action</th> 
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+<script>
+  const inventory = [];
+  function validateEmail(email) {
+    const regex = /^[a-z0-9]+@gmail\.com$/;
+    return regex.test(email);
+  }
+  function validateNoSpecialChars(text) {
+    const regex = /^[a-zA-Z0-9 ]*$/;
+    return regex.test(text);
+  }
+
+  async function addItem() {
+    console.log("🟢 Add button clicked / Enter pressed");
+
+    const user = document.getElementById('user').value.trim();
+    const name = document.getElementById('name').value.trim();
+    const id = document.getElementById('itemId').value.trim();
+    const number = document.getElementById('number').value.trim();
+    const qty = document.getElementById('qty').value.trim();
+    const mail = document.getElementById('EMAIL').value.trim();
+    const deptHead = document.getElementById('deptHead').value.trim();
+    const approvalHead = document.getElementById('approvalHead').value.trim();
+    const issueDate = document.getElementById('issueDate').value;
+    const acceptance = document.getElementById('acceptance').value.trim();
+    const assignedBy = document.getElementById('assignedBy').value.trim();
+
+   
+    if (!user || !name || !id || !number || !qty || !mail) {  
+      alert("Please fill all required fields!");
+      return;
+    }
+
+   
+    if (!validateEmail(mail)) {
+      alert("Please enter a valid Gmail address");
+      return;
+    }
+
+   
+    if (!validateNoSpecialChars(user) || 
+        !validateNoSpecialChars(name) || 
+        !validateNoSpecialChars(id) || 
+        !validateNoSpecialChars(number) || 
+        !validateNoSpecialChars(deptHead) || 
+        !validateNoSpecialChars(qty)||
+        !validateNoSpecialChars(approvalHead) || 
+        !validateNoSpecialChars(assignedBy) || 
+        !validateNoSpecialChars(acceptance)) {
+      alert("Special characters are not allowed (only letters, numbers, spaces allowed).");
+      return;
+    }
+
+   
+    if (qty <= 0 || qty > 10) {
+      alert("Quantity must be between 1 and 10");
+      return;
+    }
+
+   
+    const isDuplicate = inventory.some(item => item.serialNumber === number);
+    if (isDuplicate) {
+      alert("This Serial Number is already used!");
+      return;
+    }
+
+   
+    if (issueDate) {
+      const selectedDate = new Date(issueDate);
+      const today = new Date();
+      selectedDate.setHours(0,0,0,0);
+      today.setHours(0,0,0,0);
+      if (selectedDate > today) {
+        alert("Issue date cannot be in the future!");
+        return;
+      }
+    }
+
+
+    const item = {
+      userId: user,
+      assetname: name,
+      model: id,
+      serialNumber: number,
+      quantity: qty,
+      departmentHead: deptHead,
+      approvalHead: approvalHead,
+      assignedby: assignedBy,
+      email: mail,
+      acceptance: acceptance,
+      date: issueDate
+    };
+
+    console.log("Sending item to backend:", item);
+
+    try {
+      const response = await fetch("http://127.0.0.1:5001/api/assets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(item),
+      });
+
+      if (!response.ok) throw new Error(" Backend returned error");
+      const result = await response.json();
+      console.log("✅ Saved:", result);
+      alert("SAVED SUCCESSFULLY🎉!");
+
+      inventory.push(item);
+      renderTable();
+      clearInputs();
+      document.getElementById("user").focus();
+    } catch (err) {
+      console.error(" Fetch Error:", err);
+      alert("FAILED TO SAVE😒!");
+    }
+  }
+
+
+  function renderTable() {
+    const tbody = document.querySelector("#inventoryTable tbody");
+    tbody.innerHTML = "";
+    inventory.forEach((item, index) => {
+      const row = `
+        <tr>
+          <td>${item.userId}</td>
+          <td>${item.assetname}</td>
+          <td>${item.model}</td>
+          <td>${item.serialNumber}</td>
+          <td>${item.quantity}</td>
+          <td>${item.email}</td>
+          <td>${item.departmentHead}</td>
+          <td>${item.approvalHead}</td>
+          <td>${item.date}</td>
+          <td>${item.acceptance}</td>
+          <td>${item.assignedby}</td>
+          <td><button onclick="editItem(${index})">Modify</button></td>
+          <td><button onclick="deleteItem(${index})">Delete</button></td>
+        </tr>
+      `;
+      tbody.innerHTML += row;
+    });
+  }
+
+
+  function deleteItem(index) {
+    inventory.splice(index, 1);
+    renderTable();
+  }
+  function clearInputs() {
+    document.querySelectorAll("input").forEach(input => input.value = "");
+  }
+
+
+  document.getElementById("addBtn").addEventListener("click", addItem);
+
+
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach((input, index) => {
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        } else {
+          document.getElementById("addBtn").click();
+            document.getElementById("addBtn").addEventListener("click", addItem);
+      document.getElementById("updateBtn").addEventListener("click", updateItem);
+        }
+      }
+    });
+  });
+</script>
+</body>
+</html> 

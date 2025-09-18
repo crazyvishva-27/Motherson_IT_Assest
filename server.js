@@ -5,11 +5,9 @@ const cors = require("cors");
 const app = express();
 const PORT = 5001;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// MongoDB connect
 mongoose.connect("mongodb://127.0.0.1:27017/assetdb", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -17,7 +15,6 @@ mongoose.connect("mongodb://127.0.0.1:27017/assetdb", {
 .then(() => console.log("✅ MongoDB Connected"))
 .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// Schema
 const assetSchema = new mongoose.Schema({
   userId: String,
   assetname: String,      
@@ -31,9 +28,8 @@ const assetSchema = new mongoose.Schema({
   acceptance: String,
   date: Date,
 });
-// Model
+
 const Asset = mongoose.model("Asset", assetSchema);
-//  Create asset
 app.post("/api/assets", async (req, res) => {
   try {
     const assetData = { ...req.body, quantity: parseInt(req.body.quantity) };
@@ -45,7 +41,7 @@ app.post("/api/assets", async (req, res) => {
   }
 });
 
-//  Get all assets
+
 app.get("/api/assets", async (req, res) => {
   try {
     const assets = await Asset.find();
@@ -55,7 +51,7 @@ app.get("/api/assets", async (req, res) => {
   }
 });
 
-//  Delete asset by ID
+
 app.delete("/api/assets/:id", async (req, res) => {
   try {
     await Asset.findByIdAndDelete(req.params.id);
@@ -65,7 +61,7 @@ app.delete("/api/assets/:id", async (req, res) => {
   }
 });
 
-// Start server
+
 app.listen(PORT, () => {
   console.log(`🚀 Backend running at http://localhost:${PORT}`);
 });

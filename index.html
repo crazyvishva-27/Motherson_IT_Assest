@@ -125,7 +125,7 @@
   }
 
   async function addItem() {
-    console.log("🟢 Add button clicked / Enter pressed");
+    console.log("Add button clicked / Enter pressed");
 
     const user = document.getElementById('user').value.trim();
     const name = document.getElementById('name').value.trim();
@@ -204,7 +204,7 @@
 
       if (!response.ok) throw new Error(" Backend returned error");
       const result = await response.json();
-      console.log("✅ Saved:", result);
+      console.log("Saved:", result);
       alert("SAVED SUCCESSFULLY🎉!");
 
       inventory.push(item);
@@ -265,8 +265,6 @@
       }
     });
   });
-
-  // ✅ Backend la irundhu load panna
   async function loadInventory() {
     try {
       const response = await fetch("http://127.0.0.1:5001/api/assets");
@@ -277,12 +275,10 @@
     }
   }
 
-  // ✅ Safe text function
   function safeText(value) {
     return value ? value.toString().toLowerCase() : "";
   }
 
-  // ✅ Search filter
   document.getElementById("search").addEventListener("input", (e) => {
     const query = e.target.value.toLowerCase();
     const filtered = inventory.filter(item =>
@@ -299,8 +295,6 @@
     );
     renderTable(filtered);
   });
-
-  // ✅ Load on startup
   loadInventory();
 </script>
 </body>

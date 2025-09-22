@@ -58,7 +58,7 @@
 <body>
   <h2>❁Asset Management❁</h2>
   <hr>
-  <form>
+  <form id="assetForm">
     <label for="user">USERID:</label>
     <input type="text" id="user" placeholder="User Id" required /> 
     <label for="name">ASSET:</label>
@@ -109,8 +109,7 @@
     <tbody></tbody>
   </table>
 
- <script>
-  
+<script>
   let inventory = []; 
 
   function validateEmail(email) {
@@ -122,23 +121,22 @@
     return regex.test(text);
   }
 
-  async function addItem() {
-    console.log("Add Button clicked/Enter pressed");
-    const addBtn=
-  document.getElementById("addBtn");
-  inputs.forEach((inputs,index)=>
-{
-  inputs.addEventListener("keydown", function(e){
-    if(e.key==="Enter"){
-      e.preventDefault();
-      if(index < inputs.length-1){
-        inputs[index+1].focus();
-      }else{
-        addItem();
+  // ✅ Enter → next input
+  const inputs = document.querySelectorAll("#assetForm input");
+  inputs.forEach((input, index) => {
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        } else {
+          addItem();
+        }
       }
-    }
-  })
-})
+    });
+  });
+
+  async function addItem() {
     const user = document.getElementById('user').value.trim();
     const name = document.getElementById('name').value.trim();
     const id = document.getElementById('itemId').value.trim();
@@ -180,20 +178,17 @@
       alert("This Serial number is already used!");
       return;
     }
-    if(issueDate)
-    {
-      const selectedDate =newDate(issueDate);
+    if(issueDate) {
+      const selectedDate = new Date(issueDate);
       const today=new Date();
       selectedDate.setHours(0,0,0,0);
       today.setHours(0,0,0,0)
-      if(selectedDate > today)
-    {
-      alert("Issue date cannot be in the future!");
-      return;
+      if(selectedDate > today) {
+        alert("Issue date cannot be in the future!");
+        return;
+      }
     }
-    }
-    
-     
+
     const item = {
       userId: user,
       assetname: name,
@@ -207,9 +202,6 @@
       acceptance: acceptance,
       date: issueDate
     };
-    
-    
-
 
     try {
       const response = await fetch("http://127.0.0.1:5001/api/assets", {
@@ -224,14 +216,13 @@
 
       inventory.push(result); 
       renderTable(inventory);
-      clearInputs();
+      document.getElementById("assetForm").reset();
       document.getElementById("user").focus();
     } catch (err) {
       console.error(" Fetch Error:", err);
       alert("FAILED TO SAVE😒!");
     }
   }
-   
 
   function renderTable(data = inventory) {
     const tbody = document.querySelector("#inventoryTable tbody");
@@ -263,29 +254,30 @@
   }
   
   async function deleteItem(index) {
-  const item = inventory[index];
-  if (!item || !item._id) { 
-    alert("ID missing!");
-    return;
+    const item = inventory[index];
+    if (!item || !item._id) { 
+      alert("ID missing!");
+      return;
+    }
+
+    if (!confirm("Are you sure you want to delete this item?")) return;
+
+    try {
+      const res = await fetch(`http://127.0.0.1:5001/api/assets/${item._id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete");
+
+      inventory.splice(index, 1);
+      renderTable(inventory);
+      alert("Deleted successfully ");
+    } catch (err) {
+      console.error(" Delete error:", err);
+      alert("Delete failed from DB ");
+    }
   }
 
-  if (!confirm("Are you sure you want to delete this item?")) return;
-
-  try {
-    const res = await fetch(`http://127.0.0.1:5001/api/assets/${item._id}`, {
-      method: "DELETE",
-    });
-
-    if (!res.ok) throw new Error("Failed to delete");
-
-    inventory.splice(index, 1);
-    renderTable(inventory);
-    alert("Deleted successfully ");
-  } catch (err) {
-    console.error(" Delete error:", err);
-    alert("Delete failed from DB ");
-  }
-}
   async function loadInventory() {
     try {
       const response = await fetch("http://127.0.0.1:5001/api/assets");
@@ -317,10 +309,8 @@
     renderTable(filtered);
   });
   
+  document.getElementById("addBtn").addEventListener("click", addItem);
   loadInventory();
 </script>
 </body>
-</html> 
-
-
-
+</html>

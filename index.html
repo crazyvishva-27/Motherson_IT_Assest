@@ -111,7 +111,7 @@
 
  <script>
   
-  let inventory = []; // global array
+  let inventory = []; 
 
   function validateEmail(email) {
     const regex = /^[a-z0-9]+@gmail\.com$/;
@@ -222,7 +222,7 @@
       const result = await response.json();
       alert("SAVED SUCCESSFULLY🎉!");
 
-      inventory.push(result); // backend-la save pannadhu push panrom
+      inventory.push(result); 
       renderTable(inventory);
       clearInputs();
       document.getElementById("user").focus();
@@ -280,10 +280,10 @@
 
     inventory.splice(index, 1);
     renderTable(inventory);
-    alert("Deleted successfully ✅");
+    alert("Deleted successfully ");
   } catch (err) {
-    console.error("❌ Delete error:", err);
-    alert("Delete failed from DB ❌");
+    console.error(" Delete error:", err);
+    alert("Delete failed from DB ");
   }
 }
   async function loadInventory() {
@@ -292,7 +292,7 @@
       inventory = await response.json();
       renderTable(inventory);
     } catch (err) {
-      console.error("❌ Failed to fetch:", err);
+      console.error("Failed to fetch:", err);
     }
   }
 

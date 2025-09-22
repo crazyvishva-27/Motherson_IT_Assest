@@ -30,6 +30,7 @@ const assetSchema = new mongoose.Schema({
 });
 
 const Asset = mongoose.model("Asset", assetSchema);
+
 app.post("/api/assets", async (req, res) => {
   try {
     const assetData = { ...req.body, quantity: parseInt(req.body.quantity) };
@@ -51,16 +52,19 @@ app.get("/api/assets", async (req, res) => {
   }
 });
 
-
 app.delete("/api/assets/:id", async (req, res) => {
   try {
-    await Asset.findByIdAndDelete(req.params.id);
+    const result = await Asset.findByIdAndDelete(req.params.id);
+
+    if (!result) {
+      return res.status(404).json({ message: "Asset not found" });
+    }
+
     res.json({ message: "Asset deleted successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: "Invalid ID format" });
   }
 });
-
 
 app.listen(PORT, () => {
   console.log(`🚀 Backend running at http://localhost:${PORT}`);

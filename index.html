@@ -314,7 +314,7 @@ async function deleteItem(index) {
   }  
 }  
   
-// Search  
+
 document.getElementById("search").addEventListener("input",(e)=>{  
   const q = e.target.value.toLowerCase();  
   const filtered = inventory.filter(item =>  
@@ -323,7 +323,7 @@ document.getElementById("search").addEventListener("input",(e)=>{
   renderTable(filtered);  
 });  
   
-// Load data  
+
 async function loadInventory(){  
   try {  
     const res = await fetch("http://127.0.0.1:5001/api/assets");  

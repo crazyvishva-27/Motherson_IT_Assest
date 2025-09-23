@@ -8,7 +8,6 @@ const PORT = 5001;
 app.use(cors());
 app.use(express.json());
 
-// ✅ Connect MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/assetdb", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -16,7 +15,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/assetdb", {
 .then(() => console.log("✅ MongoDB Connected"))
 .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Schema
+
 const assetSchema = new mongoose.Schema({
   userId: String,
   assetname: String,      
@@ -33,7 +32,6 @@ const assetSchema = new mongoose.Schema({
 
 const Asset = mongoose.model("Asset", assetSchema);
 
-// ✅ Create Asset
 app.post("/api/assets", async (req, res) => {
   try {
     const assetData = { ...req.body, quantity: parseInt(req.body.quantity) };
@@ -45,17 +43,16 @@ app.post("/api/assets", async (req, res) => {
   }
 });
 
-// ✅ Read All Assets
+
 app.get("/api/assets", async (req, res) => {
   try {
     const assets = await Asset.find();
-    res.json(assets);   // 🔥 Missing line fixed
+    res.json(assets);  
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✅ Update Asset by ID
 app.put("/api/assets/:id", async (req, res) => {
   try {
     const updatedData = { ...req.body, quantity: parseInt(req.body.quantity) };
@@ -63,7 +60,7 @@ app.put("/api/assets/:id", async (req, res) => {
     const updatedAsset = await Asset.findByIdAndUpdate(
       req.params.id,
       updatedData,
-      { new: true } // return updated document
+      { new: true } 
     );
 
     if (!updatedAsset) {
@@ -76,7 +73,7 @@ app.put("/api/assets/:id", async (req, res) => {
   }
 });
 
-// ✅ Delete Asset
+
 app.delete("/api/assets/:id", async (req, res) => {
   try {
     const result = await Asset.findByIdAndDelete(req.params.id);
@@ -91,7 +88,6 @@ app.delete("/api/assets/:id", async (req, res) => {
   }
 });
 
-// ✅ Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Backend running at http://localhost:${PORT}`);
 });

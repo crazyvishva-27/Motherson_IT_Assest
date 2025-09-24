@@ -1,121 +1,168 @@
-<!DOCTYPE html>   
-<html lang="en">  
-<head>  
-  <meta charset="UTF-8">  
-  <title>Inventory Asset Management</title>  
-  <style>  
-    body {   
-      font-family: 'Franklin Gothic Medium', Arial, sans-serif;   
-      padding: 10px;  
-      background-image: url(Samvardhana-Motherson-img.jpg);   
-      background-repeat: no-repeat;  
-      background-position: center;  
-      background-size: cover;  
-      background-attachment: fixed;  
-      margin: 20px;  
-      font-size: x-large;  
-      font-weight: 500;  
-    }  
-    table {   
-      border-collapse: collapse;  
-      width: 100%;  
-      margin-top: 50px;   
-    }  
-    th, td {  
-      border: 1px solid #460606;  
-      padding: 10px;  
-      text-align: center;   
-      background-color: aliceblue;  
-    }  
-    th {   
-      background-color: #c71e1e;   
-      color: white;  
-      padding: 10px;  
-    }  
-    input {   
-      margin: 15px;  
-      padding: 5px;  
-      width: 12%;  
-      border-color: rgb(94, 6, 6);  
-      font-size: large;  
-    }  
-    button {   
-      padding: 6px 12px;  
-      margin: 10px;   
-      font-size: large;  
-      background-color: rgb(70, 5, 5);  
-      color: antiquewhite;  
-      cursor: pointer;  
-      display: block;  
-    }  
-    h2 {  
-      color: rgb(109, 0, 0);  
-      background-color: rgb(255, 255, 255);  
-      width: 15%;  
-      padding: 5px;  
-      border-radius: 10px;  
-      margin: 15px;  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory Asset Management</title>
+  <style>
+    body { 
+      font-family: 'Franklin Gothic Medium', Arial, sans-serif; 
+      padding: 10px;
+      background-image: url(Samvardhana-Motherson-img.jpg); 
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      background-attachment: fixed;
+      margin: 20px;
+      font-size: large;
+      font-weight: 500;
+    }
+    table { 
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 50px; 
+      
+    }
+    th, td {
+      border: 1px solid #460606;
+      padding: 10px;
+      text-align: center; 
+      background-color: aliceblue;
       font-family: Georgia, Times, 'Times New Roman', serif;  
-    }  
-  </style>  
-</head>  
-<body>  
-  <h2>❁Asset Management❁</h2>  
-  <hr>  
-  <form id="assetForm">  
-    <label>USERID:</label>  
-    <input type="text" id="user" placeholder="User Id" required />   
-    <label>ASSET:</label>  
-    <input type="text" id="name" placeholder="Asset" required />  
-    <label>MODEL:</label>  
-    <input type="text" id="itemId" placeholder="Model" required />  
-    <label>SERIALNUMBER:</label>  
-    <input type="text" id="number" placeholder="Serial number" required />  
-    <br><br>  
-    <label>QUANTITY:</label>  
-    <input type="text" id="qty" placeholder="Quantity" required />  
-    <label>EMAIL:</label>  
-    <input type="text" id="EMAIL" placeholder="EMAIL" required />  
-    <label>DEPARTMENT HEAD:</label>  
-    <input type="text" id="deptHead" placeholder="Department Head" required />  
-    <label>APPROVAL HEAD:</label>  
-    <input type="text" id="approvalHead" placeholder="Approval Head" required />  
-    <br><br>  
-    <label>ISSUEDATE:</label>  
-    <input type="date" id="issueDate" required />  
-    <label>ACCEPTANCE:</label>  
-    <input type="text" id="acceptance" placeholder="Acceptance" />  
-    <label>ASSIGNED BY:</label>  
-    <input type="text" id="assignedBy" placeholder="Assigned By" />  
-    <br><br>  
-  </form>  
-  <button id="addBtn">Add Item</button>  
-  <button id="updateBtn">Update</button>  
-  <hr>  
-  <input type="text" id="search" placeholder="Search here...."/>  
-  <table id="inventoryTable">  
-    <thead>  
-      <tr>  
-        <th>User Id</th>  
-        <th>Name</th>  
-        <th>Model</th>  
-        <th>Serial number</th>  
-        <th>Qty</th>  
-        <th>EMAIL</th>  
-        <th>Dept Head</th>  
-        <th>Approval Head</th>  
-        <th>Date</th>  
-        <th>Acceptance</th>  
-        <th>Assigned By</th>  
-        <th> Edit </th>  
-        <th> Delete </th>  
-      </tr>  
-    </thead>  
-    <tbody>
+    }
+    th { 
+      background-color: #c71e1e; 
+      color: white;
+      padding: 10px;
+      font-family:Arial, Helvetica, sans-serif
+    }
+   
+    #assetForm {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 15px 25px;
+      max-width: 800px;
+      background: rgba(255,255,255,0.9);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      margin: 30px auto;
+      position: relative;
 
-    </tbody>  
+    }
+    #assetForm label {
+      text-align: right;
+      font-weight: bold;
+      color: #460606;
+      align-self: center;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    #assetForm input {
+      padding: 8px;
+      border: 1px solid #460606;
+      border-radius: 6px;
+      font-size: 15px;
+      width: 100%;
+      font-family: 'Times New Roman', Times, serif;
+      
+    }
+    button { 
+      padding: 8px 15px;
+      margin: 10px; 
+      font-size: large;
+      background-color: rgb(70, 5, 5);
+      color: antiquewhite;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+    }
+    button:hover {
+      background-color: #a00;
+    }
+    h2 {
+      color: rgb(109, 0, 0);
+      background-color: rgb(255, 255, 255);
+      width: fit-content;
+      padding: 8px 20px;
+      border-radius: 10px;
+      margin: 15px auto;
+    font-family: Georgia, Times, 'Times New Roman', serif;  
+      
+    }
+    #search {
+      padding: 8px;
+      width: 250px;
+      border: 1px solid #460606;
+      border-radius: 6px;
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>❁ Asset Management ❁</h2>
+  <hr>
+  <form id="assetForm">
+    <label>USERID:</label>
+    <input type="text" id="user" placeholder="User Id" required />
+
+    <label>ASSET:</label>
+    <input type="text" id="name" placeholder="Asset" required />
+
+    <label>MODEL:</label>
+    <input type="text" id="itemId" placeholder="Model" required />
+
+    <label>SERIALNUMBER:</label>
+    <input type="text" id="number" placeholder="Serial number" required />
+
+    <label>QUANTITY:</label>
+    <input type="text" id="qty" placeholder="Quantity" required />
+
+    <label>EMAIL:</label>
+    <input type="text" id="EMAIL" placeholder="EMAIL" required />
+
+    <label>DEPARTMENT HEAD:</label>
+    <input type="text" id="deptHead" placeholder="Department Head" required />
+
+    <label>APPROVAL HEAD:</label>
+    <input type="text" id="approvalHead" placeholder="Approval Head" required />
+
+    <label>ISSUEDATE:</label>
+    <input type="date" id="issueDate" required />
+
+    <label>ACCEPTANCE:</label>
+    <input type="text" id="acceptance" placeholder="Acceptance" />
+
+    <label>ASSIGNED BY:</label>
+    <input type="text" id="assignedBy" placeholder="Assigned By" />
+  </form>
+
+  <button id="addBtn">Add Item</button>
+  <button id="updateBtn" style="display:none;">Update</button>
+  <hr>
+  <input type="text" id="search" placeholder="Search here...."/>
+
+  <table id="inventoryTable">
+    <thead>
+      <tr>
+        <th>User Id</th>
+        <th>Name</th>
+        <th>Model</th>
+        <th>Serial number</th>
+        <th>Qty</th>
+        <th>EMAIL</th>
+        <th>Dept Head</th>
+        <th>Approval Head</th>
+        <th>Date</th>
+        <th>Acceptance</th>
+        <th>Assigned By</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
   </table>
-    <script>  
+  
+  <script>  
 let inventory = [];  
 let editIndex = null;  
   
@@ -337,3 +384,9 @@ loadInventory();
 document.getElementById("addBtn").addEventListener("click", addItem);
 </script>  </body>  
 </html>  
+
+
+
+
+
+  

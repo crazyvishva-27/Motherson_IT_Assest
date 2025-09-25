@@ -20,23 +20,21 @@
       border-collapse: collapse;
       width: 100%;
       margin-top: 50px; 
-      
     }
     th, td {
       border: 1px solid #460606;
       padding: 10px;
       text-align: center; 
       background-color: aliceblue;
-       font-family:'fantasy';
-       font-size:larger;
+      font-family:'fantasy';
+      font-size:larger;
     }
     th { 
       background-color: #c71e1e; 
       color: white;
       padding: 10px;
-     font-family:'Times New Roman', Times, serif;
+      font-family:'Times New Roman', Times, serif;
     }
-   
     #assetForm {
       display: grid;
       grid-template-columns: 200px 1fr;
@@ -48,14 +46,13 @@
       margin-bottom: 20px;
       margin: 30px auto;
       position: relative;
-
     }
     #assetForm label {
       text-align: right;
       font-weight: bold;
       color: #460606;
       align-self: center;
-     font-family: 'Times New Roman', Times, serif; 
+      font-family: 'Times New Roman', Times, serif; 
     }
     #assetForm input {
       padding: 8px;
@@ -63,8 +60,7 @@
       border-radius: 6px;
       font-size: 15px;
       width: 100%;
-     font-family: 'Times New Roman', Times, serif; 
-      
+      font-family: 'Times New Roman', Times, serif; 
     }
     button { 
       padding: 8px 15px;
@@ -86,8 +82,7 @@
       padding: 8px 20px;
       border-radius: 10px;
       margin: 15px auto;
-    font-family: Georgia, Times, 'Times New Roman', serif;  
-      
+      font-family: Georgia, Times, 'Times New Roman', serif;  
     }
     #search {
       padding: 8px;
@@ -101,10 +96,6 @@
 </head>
 <body>
   <h2>❁ Asset Management ❁</h2>
-  <br>
-  <br>
-  <br>
-  <br>
   <hr>
   <form id="assetForm">
     <label>USERID:</label>
@@ -145,6 +136,7 @@
   <button id="updateBtn" style="display:none;">Update</button>
   <hr>
   <input type="text" id="search" placeholder="Search here...."/>
+  <button id="searchBtn">Search</button>
 
   <table id="inventoryTable">
     <thead>
@@ -167,10 +159,10 @@
     <tbody></tbody>
   </table>
   
-  <script>  
+<script>
 let inventory = [];  
 let editIndex = null;  
-  
+
 function validateEmail(email) {  
   const regex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;  
   return regex.test(email);  
@@ -179,35 +171,53 @@ function validateNoSpecialChars(text) {
   const regex = /^[a-zA-Z0-9 ]*$/;  
   return regex.test(text);  
 }  
-  
+
+
 const inputs = document.querySelectorAll("#assetForm input");  
 inputs.forEach((input, index) => {  
   input.addEventListener("keydown", function (e) {  
     if (e.key === "Enter") {  
       e.preventDefault();  
-      if (index < inputs.length - 1) inputs[index + 1].focus();  
-      else{
-        if(editindex!==null)
-      {
-        updateitem();
-      }else{
-        addItem();  
-      }
+      if (index < inputs.length - 1) {
+        inputs[index + 1].focus();  
+      } else {
+        if (editIndex !== null) {
+          updateItem();
+        } else {
+          addItem();  
+        }
       } 
-    }  
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (index > 0) {
+        inputs[index - 1].focus();
+      }
+    }
   });  
 });  
-  
+
 document.getElementById("addBtn").addEventListener("click", addItem);  
 document.getElementById("updateBtn").addEventListener("click", updateItem);  
-  
+
 async function addItem() {  
   const item = getFormData();  
   if (!item) return;  
-  
+
   const isDuplicate = inventory.some((it, idx) => it.serialNumber === item.serialNumber && idx !== editIndex);  
   if (isDuplicate) { alert("Serial number already exists"); return; }  
-  
+
+  const isDuplicateUserMail = inventory.some(it => it.userId === item.userId && it.email !== item.email);
+  if (isDuplicateUserMail) { alert("Each User ID can only use one Email ID!"); return; }
+
   try {  
     const res = await fetch("http://127.0.0.1:5001/api/assets", {  
       method: "POST",  
@@ -225,13 +235,13 @@ async function addItem() {
     alert("Save failed 😒");  
   }  
 }  
-  
+
 async function updateItem() {  
   if (editIndex === null) return;  
   const item = inventory[editIndex];  
-   const updatedItem = getFormData();  
+  const updatedItem = getFormData();  
   if (!updatedItem) return;  
-  
+
   try {  
     const res = await fetch(`http://127.0.0.1:5001/api/assets/${item._id}`, {  
       method: "PUT",  
@@ -249,7 +259,7 @@ async function updateItem() {
     alert("Update failed 😒");  
   }  
 }  
-  
+
 function getFormData() {  
   const user = document.getElementById('user').value.trim();  
   const name = document.getElementById('name').value.trim();  
@@ -262,7 +272,7 @@ function getFormData() {
   const issueDate = document.getElementById('issueDate').value;  
   const acceptance = document.getElementById('acceptance').value.trim();  
   const assignedBy = document.getElementById('assignedBy').value.trim();  
-  
+
   if (!user || !name || !id || !number || !qty || !mail) {  
     alert("Please fill all required fields!"); return null;  
   }  
@@ -274,7 +284,7 @@ function getFormData() {
     alert("Special characters not allowed"); return null;  
   }  
   if (qty <= 0 || qty > 10) { alert("Quantity 1-10"); return null; }  
-  
+
   if(issueDate) {  
     const selectedDate = new Date(issueDate);  
     const today=new Date();  
@@ -282,7 +292,7 @@ function getFormData() {
     today.setHours(0,0,0,0)  
     if(selectedDate > today) { alert("Issue date cannot be in future"); return null; }  
   }  
-  
+
   return {  
     userId: user,  
     assetname: name,  
@@ -297,7 +307,7 @@ function getFormData() {
     assignedby: assignedBy  
   };  
 }  
-  
+
 function renderTable(data=inventory) {  
   const tbody = document.querySelector("#inventoryTable tbody");  
   tbody.innerHTML = "";  
@@ -322,14 +332,14 @@ function renderTable(data=inventory) {
     `;  
   });  
 }  
-  
+
 function resetForm() {  
   document.getElementById("assetForm").reset();  
   document.getElementById("addBtn").style.display="inline-block";  
-  document.getElementById("updateBtn").style.display="inline-block";  
+  document.getElementById("updateBtn").style.display="none";  
   editIndex = null;  
 }  
-  
+
 function editItem(index) {  
   const item = inventory[index];  
   editIndex = index;  
@@ -344,16 +354,16 @@ function editItem(index) {
   document.getElementById('issueDate').value = item.date ? item.date.split("T")[0] : "";  
   document.getElementById('acceptance').value = item.acceptance;  
   document.getElementById('assignedBy').value = item.assignedby;  
-  
+
   document.getElementById('addBtn').style.display = 'none';  
   document.getElementById('updateBtn').style.display = 'inline-block';  
 }  
-  
+
 async function deleteItem(index) {  
   const item = inventory[index];  
   if (!item || !item._id) return alert("ID missing");  
   if (!confirm("Delete this item?")) return;  
-  
+
   try {  
     const res = await fetch(`http://127.0.0.1:5001/api/assets/${item._id}`, { method: "DELETE" });  
     if (!res.ok) throw new Error("Failed to delete");  
@@ -365,16 +375,16 @@ async function deleteItem(index) {
     alert("Delete failed");  
   }  
 }  
-  
 
-document.getElementById("search").addEventListener("input",(e)=>{  
-  const q = e.target.value.toLowerCase();  
+
+document.getElementById("searchBtn").addEventListener("click", () => {  
+  const q = document.getElementById("search").value.toLowerCase();  
   const filtered = inventory.filter(item =>  
     Object.values(item).some(val => val && val.toString().toLowerCase().includes(q))  
   );  
   renderTable(filtered);  
 });  
-  
+
 
 async function loadInventory(){  
   try {  
@@ -386,12 +396,6 @@ async function loadInventory(){
   }  
 }  
 loadInventory();  
-document.getElementById("addBtn").addEventListener("click", addItem);
-</script>  </body>  
-</html>  
-
-
-
-
-
-  
+</script>  
+</body>  
+</html>

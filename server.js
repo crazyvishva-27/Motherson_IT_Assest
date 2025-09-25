@@ -8,38 +8,52 @@ const PORT = 5001;
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb://127.0.0.1:27017/assetdb", {
+
+mongoose.connect("mongodb://localhost:27017/assetdb", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.error("❌ MongoDB connection error:", err));
+.catch(err => console.error("❌ MongoDB Error:", err));
 
 
 const assetSchema = new mongoose.Schema({
-  userId: String,
-  assetname: String,      
+  userId: { type: String, required: true },
+  assetname: String,
   model: String,
-  serialNumber: String,
+  serialNumber: { type: String, unique: true },
   quantity: Number,
+  email: { type: String, required: true },
   departmentHead: String,
   approvalHead: String,
-  assignedby: String,
-  email: String,
+  date: String,
   acceptance: String,
-  date: Date,
+  assignedby: String,
 });
 
 const Asset = mongoose.model("Asset", assetSchema);
 
+
 app.post("/api/assets", async (req, res) => {
   try {
-    const assetData = { ...req.body, quantity: parseInt(req.body.quantity) };
-    const asset = new Asset(assetData);
+    const { userId, email, serialNumber } = req.body;
+
+    const existingSerial = await Asset.findOne({ serialNumber });
+    if (existingSerial) {
+      return res.status(400).json({ message: "Serial number already exists!" });
+    }
+
+  
+    const existingUser = await Asset.findOne({ userId });
+    if (existingUser && existingUser.email !== email) {
+      return res.status(400).json({ message: "Each User ID can only use one Email ID!" });
+    }
+
+    const asset = new Asset(req.body);
     await asset.save();
     res.status(201).json(asset);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -47,47 +61,50 @@ app.post("/api/assets", async (req, res) => {
 app.get("/api/assets", async (req, res) => {
   try {
     const assets = await Asset.find();
-    res.json(assets);  
+    res.json(assets);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
+
 
 app.put("/api/assets/:id", async (req, res) => {
   try {
-    const updatedData = { ...req.body, quantity: parseInt(req.body.quantity) };
+    const { userId, email, serialNumber } = req.body;
 
-    const updatedAsset = await Asset.findByIdAndUpdate(
-      req.params.id,
-      updatedData,
-      { new: true } 
-    );
-
-    if (!updatedAsset) {
-      return res.status(404).json({ message: "Asset not found" });
+    
+    const existingSerial = await Asset.findOne({ serialNumber, _id: { $ne: req.params.id } });
+    if (existingSerial) {
+      return res.status(400).json({ message: "Serial number already exists!" });
     }
 
-    res.json(updatedAsset);
+  
+    const existingUser = await Asset.findOne({ userId, _id: { $ne: req.params.id } });
+    if (existingUser && existingUser.email !== email) {
+      return res.status(400).json({ message: "Each User ID can only use one Email ID!" });
+    }
+
+    const updated = await Asset.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ message: "Asset not found" });
+
+    res.json(updated);
   } catch (err) {
-    res.status(400).json({ error: "Update failed: " + err.message });
+    res.status(500).json({ message: err.message });
   }
 });
-
 
 app.delete("/api/assets/:id", async (req, res) => {
   try {
-    const result = await Asset.findByIdAndDelete(req.params.id);
-
-    if (!result) {
-      return res.status(404).json({ message: "Asset not found" });
-    }
+    const deleted = await Asset.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: "Asset not found" });
 
     res.json({ message: "Asset deleted successfully" });
   } catch (err) {
-    res.status(400).json({ error: "Invalid ID format" });
+    res.status(500).json({ message: err.message });
   }
 });
 
+
 app.listen(PORT, () => {
-  console.log(`🚀 Backend running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://127.0.0.1:${PORT}`);
 });
